@@ -10,7 +10,7 @@
 </main>
 
 <footer>
-	<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
+	<p>Designed and developed by <a href="https://501a.netlify.app">501A</a></p>
 </footer>
 
 <style>
