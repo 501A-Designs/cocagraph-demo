@@ -1,6 +1,6 @@
 <script>
 	import { draggable } from '@neodrag/svelte'
-    export let src, imageIndex, deleteImage;
+    export let imageUrl, deleteImage;
 
     let showOnHover = false;
 </script>
@@ -12,12 +12,14 @@
     on:mouseleave={()=> showOnHover=false}
 >
     <img
-        src={src}
+        src={imageUrl}
         alt={'no image inserted'}
     />
     {#if showOnHover}
         <!-- <p style="margin:0; padding:0;">Double click to change image</p> -->
-        <button on:click={() => deleteImage(imageIndex)}>Delete Image</button>
+        <button on:click={() => {deleteImage()}}>
+            Delete Image
+        </button>
     {/if}
 </div>
 

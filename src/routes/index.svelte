@@ -8,6 +8,14 @@
 	import TextContainer from '../lib/TextContainer.svelte';
 	import { onMount } from 'svelte';
 
+	let locationX,locationY;
+	const mouseLocation = (event) => {
+		const target = event.target;
+		const rect = target.getBoundingClientRect();
+		locationX = event.clientX - rect.left;
+		locationY = event.clientY - rect.top;
+	}
+
 	let imageUrlArray = [];
 	
 	let textArray = [];
@@ -15,16 +23,27 @@
 		textArray = [...textArray, obj];
 	}
 	const createTextContainer = () =>{
-		let textContent = window.prompt("Add text", 'Text goes here');
+		let textContent = window.prompt('add text', 'Text goes here');
         if(textContent !== null){
-            addTextObject(textContent);
+            addTextObject(
+				{
+					text:textContent,
+					locationX:locationX,
+					locationY:locationY,
+				}
+			);
         }
 	}
-
-	const removeObject = (index) => {
-		imageUrlArray.splice(index,1)
+	
+	const refreshArray = () => {
 		imageUrlArray = imageUrlArray;
+		textArray = textArray;
 	}
+	const removeObject = (index,array) => {
+		array.splice(index,1)
+		refreshArray();
+	}
+
 	onMount(() => {
 		const addObject = (obj) => {
 			imageUrlArray = [...imageUrlArray, obj];
@@ -63,23 +82,32 @@
 		<h2 contenteditable="true">
 			double click to add text. paste images directly on screen (this text is editable as well)
 		</h2>
+		<p>cursor location: {`${locationX}, ${locationY}`}</p>
 	</div>
 
 
-	<div class="editorCanvas" on:dblclick={() =>{ createTextContainer()}}>
+	<div
+		id="editorCanvas"
+		on:mousemove={(e)=>mouseLocation(e)}
+		on:dblclick={() =>{ createTextContainer()}}
+	>
+		<!-- on:mousemove={(e)=>mouseLocation(e)} -->
 		{#each imageUrlArray as imageUrl}
 			<!-- <SomeComponent object={obj} /> -->
 			<ImageContainer
-				src={imageUrl}
-				imageIndex={imageUrlArray.indexOf(imageUrl)}
-				deleteImage={() => removeObject(imageUrlArray.indexOf(imageUrl))}
+				imageUrl={imageUrl}
+				deleteImage={() => removeObject(imageUrlArray.indexOf(imageUrl), imageUrlArray)}
 			/>
 		{/each}
 		{#each textArray as text}
 			<TextContainer
-				text={text}
+				text={text.text}
+				x={text.locationX}
+				y={text.locationY}
+				deleteText={()=> removeObject(textArray.indexOf(text), textArray)}
 			/>
 		{/each}
+				<!-- deleteText={() => removeObject(textArray.indexOf(text), textArray)} -->
 		<div style="display:grid; gap:5px; grid-template-columns:1fr 1fr 1fr; margin:1em">
 		</div>
 	</div>
@@ -88,11 +116,13 @@
 </section>
 
 <style>
-	.editorCanvas {
-		min-height: 500px;
+	#editorCanvas {
+		height: 600px;
 		width: 100%;
+		border-radius: 5px;
+		border: 1px solid transparent;
 	}
-	.editorCanvas:hover{
+	#editorCanvas:hover{
 		border: 1px solid grey;
 	}
 </style>
