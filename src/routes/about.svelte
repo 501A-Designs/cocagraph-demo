@@ -20,10 +20,9 @@
 </svelte:head>
 
 <div class="content">
-	<h1>About this app</h1>
+	<h1>about</h1>
 	<p>
-		welcome to <a href="https://kit.svelte.dev">SvelteKit</a> app. You can make your own by typing the
-		following into your command line and following the prompts:
+		welcome to cocagraph. its the note taking idea sketch pad for those take notes but don't really care whether they lose it or not. cocagraph is built using svelte kit and gun.js.
 	</p>
 	<p>
 		The page you're looking at is purely static HTML, with no client-side interactivity needed.

@@ -9,6 +9,7 @@
 	import { onMount } from 'svelte';
 
 	let locationX,locationY;
+
 	const mouseLocation = (event) => {
 		const target = event.target;
 		const rect = target.getBoundingClientRect();
@@ -17,11 +18,12 @@
 	}
 
 	let imageUrlArray = [];
-	
 	let textArray = [];
+
 	const addTextObject = (obj) => {
 		textArray = [...textArray, obj];
 	}
+
 	const createTextContainer = () =>{
 		let textContent = window.prompt('add text', 'Text goes here');
         if(textContent !== null){
@@ -43,6 +45,20 @@
 		array.splice(index,1)
 		refreshArray();
 	}
+
+	const updateTextContainerLocation = (index,x,y) => {
+		textArray = textArray.map(obj => {
+			if (textArray.indexOf(obj) === index) {
+				return {
+					...obj,
+					locationX:x,
+					locationY:y,
+				};
+			}
+			return obj;
+		});
+		console.log(textArray);
+	};
 
 	onMount(() => {
 		const addObject = (obj) => {
@@ -75,12 +91,12 @@
 </svelte:head>
 
 <section>
-	<div style="text-align: center;">
-		<h1 contenteditable="true">
-			starterpack maker
+	<div style="text-align: left;">
+		<h1>
+			cacograph
 		</h1>
-		<h2 contenteditable="true">
-			double click to add text. paste images directly on screen (this text is editable as well)
+		<h2>
+			those notes that you find between your desk and the wall.
 		</h2>
 		<p>cursor location: {`${locationX}, ${locationY}`}</p>
 	</div>
@@ -104,7 +120,8 @@
 				text={text.text}
 				x={text.locationX}
 				y={text.locationY}
-				deleteText={()=> removeObject(textArray.indexOf(text), textArray)}
+				removeObject={()=> removeObject(textArray.indexOf(text), textArray)}
+				updateTextContainerLocation={()=>updateTextContainerLocation(textArray.indexOf(text))}
 			/>
 		{/each}
 				<!-- deleteText={() => removeObject(textArray.indexOf(text), textArray)} -->

@@ -1,6 +1,6 @@
 <script>
 	import { draggable } from '@neodrag/svelte'
-    export let text,x,y,deleteText;
+    export let text,x,y,index, removeObject,updateTextContainerLocation;
 
     let showOnHover = false;
 </script>
@@ -14,6 +14,7 @@
     on:neodrag:end={(e) => {
         x = e.detail.offsetX;
         y = e.detail.offsetY;
+        updateTextContainerLocation(index,x,y);
     }}
 >
 
@@ -22,8 +23,11 @@
         x = e.detail.offsetX;
         y = e.detail.offsetY;
     }} -->
-    <p style="text-align:left; margin:0; padding:0">{text}</p>
-    <button on:click={() => deleteText()}>Delete Text Box</button>
+    <p 
+        style="text-align:left; margin:0; padding:0"
+
+    >{text}</p>
+    <button on:click={() => removeObject()}>delete</button>
     <!-- {#if showOnHover}
     {/if} -->
 </div>
