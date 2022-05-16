@@ -1,37 +1,69 @@
 <script>
 	import { draggable } from '@neodrag/svelte'
-    export let text,x,y,index, removeObject,updateTextContainerLocation;
-
-    let showOnHover = false;
+	import { textArray } from '../store';
+    export let text, x, y, index;
+    const updateTextContainerLocation = (x,y) => {
+		$textArray = $textArray.map(obj => {
+			if ($textArray.indexOf(obj) === index) {
+				return {
+					...obj,
+					locationX:x,
+					locationY:y,
+				};
+			}
+			return obj;
+		});
+	};
+    const updateTextContainerContent = () => {
+		let textContent = window.prompt(`new text?`, text);
+        if(textContent !== null){
+            $textArray = $textArray.map(obj => {
+                if ($textArray.indexOf(obj) === index) {
+                    return {
+                        ...obj,
+                        text:textContent,
+                    };
+                }
+                return obj;
+            });
+        }
+	}
 </script>
-
-<!-- style={`left: ${x}px; top:${y}px;`} -->
 <div
     use:draggable={{ position: { x, y } }}
     class="draggableContainer"
-    on:mouseenter={()=> showOnHover=true}
-    on:mouseleave={()=> showOnHover=false}
-    on:neodrag:end={(e) => {
-        x = e.detail.offsetX;
-        y = e.detail.offsetY;
-        updateTextContainerLocation(index,x,y);
-    }}
 >
-
-
-    <!-- on:neodrag:end={(e) => {
-        x = e.detail.offsetX;
-        y = e.detail.offsetY;
-    }} -->
-    <p 
+    <p
+        on:neodrag:end={(e) => {
+            x = e.detail.offsetX;
+            y = e.detail.offsetY;
+            updateTextContainerLocation(x,y);
+        }}
         style="text-align:left; margin:0; padding:0"
-
-    >{text}</p>
-    <button on:click={() => removeObject()}>delete</button>
-    <!-- {#if showOnHover}
-    {/if} -->
+    >
+        {text}
+    </p>
+    <div style="display:flex; align-items:center; gap:5px;">
+        <button 
+            on:click={() => {
+                    $textArray.splice(index,1);
+                    $textArray = $textArray;
+                }
+            }
+        >
+            delete
+        </button>
+        <button 
+            on:click={() => {
+                    updateTextContainerContent();
+                    $textArray = $textArray;
+                }
+            }
+        >
+            update content
+        </button>
+    </div>
 </div>
-
 <style>
 	.draggableContainer {
         border-radius: 5px;

@@ -7,7 +7,8 @@
 	import ImageContainer from '../lib/ImageContainer.svelte';
 	import TextContainer from '../lib/TextContainer.svelte';
 	import { onMount } from 'svelte';
-
+	import { textArray } from '../store';
+	
 	let locationX,locationY;
 
 	const mouseLocation = (event) => {
@@ -16,73 +17,51 @@
 		locationX = event.clientX - rect.left;
 		locationY = event.clientY - rect.top;
 	}
-
-	let imageUrlArray = [];
-	let textArray = [];
-
 	const addTextObject = (obj) => {
-		textArray = [...textArray, obj];
+		$textArray = [...$textArray, obj];
 	}
-
-	const createTextContainer = () =>{
-		let textContent = window.prompt('add text', 'Text goes here');
+	const createTextContainer = () => {
+		let textContent = window.prompt(`add text box`, 'Text goes here');
         if(textContent !== null){
             addTextObject(
 				{
-					text:textContent,
+					text:textContent + ' ' + locationX + ', ' + locationY,
 					locationX:locationX,
 					locationY:locationY,
 				}
 			);
         }
 	}
-	
-	const refreshArray = () => {
-		imageUrlArray = imageUrlArray;
-		textArray = textArray;
-	}
-	const removeObject = (index,array) => {
-		array.splice(index,1)
-		refreshArray();
-	}
 
-	const updateTextContainerLocation = (index,x,y) => {
-		textArray = textArray.map(obj => {
-			if (textArray.indexOf(obj) === index) {
-				return {
-					...obj,
-					locationX:x,
-					locationY:y,
-				};
-			}
-			return obj;
-		});
-		console.log(textArray);
-	};
+	// const removeObject = (index,array) => {
+	// 	array.splice(index,1);
+	// 	console.log(array);
+	// }
 
-	onMount(() => {
-		const addObject = (obj) => {
-			imageUrlArray = [...imageUrlArray, obj];
-		}
-		var IMAGE_MIME_REGEX = /^image\/(p?jpeg|gif|png)$/i;
-		var loadImage = function (file) {
-			var reader = new FileReader();
-			reader.onload = function(e){
-				addObject(e.target.result)
-			};
-			reader.readAsDataURL(file);
-		};
-		document.onpaste = function(e){
-			var items = e.clipboardData.items;
-			for (var i = 0; i < items.length; i++) {
-				if (IMAGE_MIME_REGEX.test(items[i].type)) {
-					loadImage(items[i].getAsFile());
-					return;
-				}
-			}
-			e.PreventDefault()
-		}
-	})
+	// let imageUrlArray = [];
+	// onMount(() => {
+	// 	const addObject = (obj) => {
+	// 		imageUrlArray = [...imageUrlArray, obj];
+	// 	}
+	// 	var IMAGE_MIME_REGEX = /^image\/(p?jpeg|gif|png)$/i;
+	// 	var loadImage = function (file) {
+	// 		var reader = new FileReader();
+	// 		reader.onload = function(e){
+	// 			addObject(e.target.result)
+	// 		};
+	// 		reader.readAsDataURL(file);
+	// 	};
+	// 	document.onpaste = function(e){
+	// 		var items = e.clipboardData.items;
+	// 		for (var i = 0; i < items.length; i++) {
+	// 			if (IMAGE_MIME_REGEX.test(items[i].type)) {
+	// 				loadImage(items[i].getAsFile());
+	// 				return;
+	// 			}
+	// 		}
+	// 		e.PreventDefault()
+	// 	}
+	// })
 </script>
 
 <svelte:head>
@@ -93,7 +72,7 @@
 <section>
 	<div style="text-align: left;">
 		<h1>
-			cacograph
+			cocagraph
 		</h1>
 		<h2>
 			those notes that you find between your desk and the wall.
@@ -104,24 +83,24 @@
 
 	<div
 		id="editorCanvas"
-		on:mousemove={(e)=>mouseLocation(e)}
-		on:dblclick={() =>{ createTextContainer()}}
+		on:mousemove={(e) => mouseLocation(e)}
+		on:dblclick={() => createTextContainer()}
 	>
-		<!-- on:mousemove={(e)=>mouseLocation(e)} -->
-		{#each imageUrlArray as imageUrl}
-			<!-- <SomeComponent object={obj} /> -->
+		<!-- on:click={() => createTextContainer()} -->
+		<!-- {#each $imageArray as image}
 			<ImageContainer
-				imageUrl={imageUrl}
-				deleteImage={() => removeObject(imageUrlArray.indexOf(imageUrl), imageUrlArray)}
+				src={image.src}
+				x={image.x}
+				y={image.y}
+				index={$imageArray.indexOf(imageUrl)}
 			/>
-		{/each}
-		{#each textArray as text}
+		{/each} -->
+		{#each $textArray as text}
 			<TextContainer
 				text={text.text}
 				x={text.locationX}
 				y={text.locationY}
-				removeObject={()=> removeObject(textArray.indexOf(text), textArray)}
-				updateTextContainerLocation={()=>updateTextContainerLocation(textArray.indexOf(text))}
+				index={$textArray.indexOf(text)}
 			/>
 		{/each}
 				<!-- deleteText={() => removeObject(textArray.indexOf(text), textArray)} -->
@@ -138,6 +117,7 @@
 		width: 100%;
 		border-radius: 5px;
 		border: 1px solid transparent;
+		cursor: copy;
 	}
 	#editorCanvas:hover{
 		border: 1px solid grey;
