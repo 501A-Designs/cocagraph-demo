@@ -1,18 +1,19 @@
 <script>
-    import { textArray } from "../store";
-    export let firstElementIndex, secondElementIndex, color, thickness;
-    const firstElementData = $textArray[firstElementIndex];
-    const secondElementData = $textArray[secondElementIndex];
-    const x1 = firstElementData.locationX;
-    const y1 = firstElementData.locationY;
-    const x2 = secondElementData.locationX;
-    const y2 = secondElementData.locationY;
-    const length = Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
-    const cx = ((x1 + x2) / 2) - (length / 2);
-    const cy = ((y1 + y2) / 2) - (thickness / 2);
-    const angle = Math.atan2((y1 - y2), (x1 - x2)) * (180 / Math.PI);
-</script>
+    import { textArray, connectionArray,isDragging } from "../store";
+    export let firstElementIndex,secondElementIndex, color, thickness;
+    // console.log(firstElementLocation);
+    let firstElementData = $textArray[firstElementIndex];
+    let secondElementData = $textArray[secondElementIndex];
+    let x1 = firstElementData.locationX;
+    let y1 = firstElementData.locationY;
+    let x2 = secondElementData.locationX;
+    let y2 = secondElementData.locationY;
 
+    let length = Math.sqrt(((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1)));
+    let cx = ((x1 + x2) / 2) - (length / 2);
+    let cy = ((y1 + y2) / 2) - (thickness / 2);
+    let angle = Math.atan2((y1 - y2), (x1 - x2)) * (180 / Math.PI);
+</script>
 
 <div
     class="connectionLine"
@@ -28,8 +29,6 @@
 
 <style>
     .connectionLine{
-        padding:0px;
-        margin:0px;
         line-height:1px;
         position:absolute;
     }

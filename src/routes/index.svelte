@@ -7,10 +7,10 @@
 	import ImageContainer from '../lib/ImageContainer.svelte';
 	import TextContainer from '../lib/TextContainer.svelte';
 	import { onMount } from 'svelte';
-	import { textArray } from '../store';
+	import { textArray,connectionArray,isDragging } from '../store';
 	import ConnectionLine from '../lib/ConnectionLine.svelte';
 	
-	let locationX,locationY,pageX,pageY;
+	let locationX,locationY;
 
 	const mouseLocation = (event) => {
 		locationX = event.offsetX;
@@ -27,7 +27,6 @@
 					text:textContent,
 					locationX:locationX,
 					locationY:locationY,
-					connectedIndex:null,
 				}
 			);
         }
@@ -62,17 +61,6 @@
 	// 		e.PreventDefault()
 	// 	}
 	// })
-
-
-	const getOffset = (el) => {
-		const rect = el.getBoundingClientRect();
-		return {
-			left: rect.left + window.pageXOffset,
-			top: rect.top + window.pageYOffset,
-			width: rect.width || el.offsetWidth,
-			height: rect.height || el.offsetHeight
-		};
-	}
 </script>
 
 <svelte:head>
@@ -80,7 +68,7 @@
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 
-<div style="position:fixed; padding: 1em">
+<div style="position:fixed; padding: 1em; z-index: 20">
 	<h1>
 		cocagraph
 	</h1>
@@ -91,33 +79,35 @@
 	on:mousemove={(e) => mouseLocation(e)}
 	on:dblclick={() => createTextContainer()}
 >
-		<!-- on:click={() => createTextContainer()} -->
-		<!-- {#each $imageArray as image}
-			<ImageContainer
-				src={image.src}
-				x={image.x}
-				y={image.y}
-				index={$imageArray.indexOf(imageUrl)}
-			/>
-		{/each} -->
+	<!-- on:click={() => createTextContainer()} -->
+	<!-- {#each $imageArray as image}
+		<ImageContainer
+			src={image.src}
+			x={image.x}
+			y={image.y}
+			index={$imageArray.indexOf(imageUrl)}
+		/>
+	{/each} -->
 	{#each $textArray as text}
 		<TextContainer
 			text={text.text}
 			x={text.locationX}
 			y={text.locationY}
 			index={$textArray.indexOf(text)}
+			sentConnections={text.sentConnections}
+			receivingConnections={text.receivingConnections}
 		/>
-		<!-- {#if text.connectedIndex !== null}
+	{/each}
+	{#if $textArray.length > 1 && !$isDragging}
+		{#each $connectionArray as connection}
 			<ConnectionLine
-				firstElementIndex={$textArray.indexOf(text)}
-				secondElementIndex={text.connectedIndex}
+				firstElementIndex={connection.firstElementIndex}
+				secondElementIndex={connection.secondElementIndex}
 				color={'grey'}
 				thickness={1}
 			/>
-		{/if} -->
-	{/each}
-	<!-- {#each $textArray as text}
-	{/each} -->
+		{/each}
+	{/if}
 </section>
 
 <style>
