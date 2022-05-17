@@ -12,7 +12,7 @@
 
     const startingDrag = () =>{
         $isDragging = true;
-        console.log($isDragging)
+        console.log($isDragging);
     }
     const updateTextContainerLocation = (x,y) => {
 		$textArray = $textArray.map(obj => {
@@ -25,6 +25,8 @@
 			}
 			return obj;
 		});
+        console.log($textArray)
+        console.log(x,y)
 	};
 
 
@@ -59,15 +61,19 @@
 <div
     class="draggableContainer"
     use:draggable={{ position: { x, y } }}
-    on:neodrag:start={() => {startingDrag()}}
-    on:neodrag:end={(e) => {
-        $isDragging = false;
-        x = e.detail.offsetX;
-        y = e.detail.offsetY;
-        updateTextContainerLocation(x,y);
-    }}
     on:mouseenter={() => showOnHover = true}
     on:mouseleave={() => showOnHover = false}
+    on:neodrag={() => {startingDrag()}}
+    on:neodrag:end={(e) => {
+        $isDragging = false;
+        console.log(e.detail.offsetX,e.detail.offsetY);
+        console.log(x,y)
+        if (e.detail.offsetX != 0 && e.detail.offsetY != 0) {
+            x = e.detail.offsetX;
+            y = e.detail.offsetY;
+        }
+        updateTextContainerLocation(x,y);
+    }}
 >
     {#if showOnHover}
         <div>
@@ -75,7 +81,7 @@
         </div>
     {/if}
     <p
-        style="text-align:left; margin:0; padding:0"
+        style="text-align:left; margin:0; padding:0; user-select:none"
     >
         {text}
     </p>

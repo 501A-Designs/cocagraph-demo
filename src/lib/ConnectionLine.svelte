@@ -1,6 +1,6 @@
 <script>
     import { textArray, connectionArray,isDragging } from "../store";
-    export let firstElementIndex,secondElementIndex, color, thickness;
+    export let firstElementIndex,secondElementIndex, color, thickness, index;
     // console.log(firstElementLocation);
     let firstElementData = $textArray[firstElementIndex];
     let secondElementData = $textArray[secondElementIndex];
@@ -25,11 +25,26 @@
         transform:rotate(${angle}deg);
         background-color:${color};
     `}
-/>
+>
+    <button on:click={() => {
+        $connectionArray.splice(index,1);
+        $connectionArray = $connectionArray;
+    }}>delete</button>
+</div>
 
 <style>
     .connectionLine{
         line-height:1px;
         position:absolute;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+    }
+    button{
+        opacity: 0;
+        cursor: pointer;
+    }
+    .connectionLine:hover button{
+        opacity: 1;
     }
 </style>

@@ -94,8 +94,6 @@
 			x={text.locationX}
 			y={text.locationY}
 			index={$textArray.indexOf(text)}
-			sentConnections={text.sentConnections}
-			receivingConnections={text.receivingConnections}
 		/>
 	{/each}
 	{#if $textArray.length > 1 && !$isDragging}
@@ -105,6 +103,7 @@
 				secondElementIndex={connection.secondElementIndex}
 				color={'grey'}
 				thickness={1}
+				index={$connectionArray.indexOf(connection)}
 			/>
 		{/each}
 	{/if}
