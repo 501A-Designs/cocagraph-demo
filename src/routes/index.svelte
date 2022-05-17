@@ -8,14 +8,13 @@
 	import TextContainer from '../lib/TextContainer.svelte';
 	import { onMount } from 'svelte';
 	import { textArray } from '../store';
+	import ConnectionLine from '../lib/ConnectionLine.svelte';
 	
-	let locationX,locationY;
+	let locationX,locationY,pageX,pageY;
 
 	const mouseLocation = (event) => {
-		const target = event.target;
-		const rect = target.getBoundingClientRect();
-		locationX = event.clientX - rect.left;
-		locationY = event.clientY - rect.top;
+		locationX = event.offsetX;
+		locationY = event.offsetY;
 	}
 	const addTextObject = (obj) => {
 		$textArray = [...$textArray, obj];
@@ -25,9 +24,10 @@
         if(textContent !== null){
             addTextObject(
 				{
-					text:textContent + ' ' + locationX + ', ' + locationY,
+					text:textContent,
 					locationX:locationX,
 					locationY:locationY,
+					connectedIndex:null,
 				}
 			);
         }
@@ -62,6 +62,17 @@
 	// 		e.PreventDefault()
 	// 	}
 	// })
+
+
+	const getOffset = (el) => {
+		const rect = el.getBoundingClientRect();
+		return {
+			left: rect.left + window.pageXOffset,
+			top: rect.top + window.pageYOffset,
+			width: rect.width || el.offsetWidth,
+			height: rect.height || el.offsetHeight
+		};
+	}
 </script>
 
 <svelte:head>
@@ -69,23 +80,17 @@
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 
-<section>
-	<div style="text-align: left;">
-		<h1>
-			cocagraph
-		</h1>
-		<h2>
-			those notes that you find between your desk and the wall.
-		</h2>
-		<p>cursor location: {`${locationX}, ${locationY}`}</p>
-	</div>
-
-
-	<div
-		id="editorCanvas"
-		on:mousemove={(e) => mouseLocation(e)}
-		on:dblclick={() => createTextContainer()}
-	>
+<div style="position:fixed; padding: 1em">
+	<h1>
+		cocagraph
+	</h1>
+	<p style='margin:0;padding:0;'>{`cursor location: ${locationX}px,${locationY}px`}</p>
+</div>
+<section
+	id="editorCanvas"
+	on:mousemove={(e) => mouseLocation(e)}
+	on:dblclick={() => createTextContainer()}
+>
 		<!-- on:click={() => createTextContainer()} -->
 		<!-- {#each $imageArray as image}
 			<ImageContainer
@@ -95,31 +100,37 @@
 				index={$imageArray.indexOf(imageUrl)}
 			/>
 		{/each} -->
-		{#each $textArray as text}
-			<TextContainer
-				text={text.text}
-				x={text.locationX}
-				y={text.locationY}
-				index={$textArray.indexOf(text)}
+	{#each $textArray as text}
+		<TextContainer
+			text={text.text}
+			x={text.locationX}
+			y={text.locationY}
+			index={$textArray.indexOf(text)}
+		/>
+		<!-- {#if text.connectedIndex !== null}
+			<ConnectionLine
+				firstElementIndex={$textArray.indexOf(text)}
+				secondElementIndex={text.connectedIndex}
+				color={'grey'}
+				thickness={1}
 			/>
-		{/each}
-				<!-- deleteText={() => removeObject(textArray.indexOf(text), textArray)} -->
-		<div style="display:grid; gap:5px; grid-template-columns:1fr 1fr 1fr; margin:1em">
-		</div>
-	</div>
-
-	<!-- <Counter /> -->
+		{/if} -->
+	{/each}
+	<!-- {#each $textArray as text}
+	{/each} -->
 </section>
 
 <style>
 	#editorCanvas {
-		height: 600px;
-		width: 100%;
+		width: 3000px;
+		height: 3000px;
 		border-radius: 5px;
-		border: 1px solid transparent;
+		margin: 0;
+		padding: 0;
 		cursor: copy;
-	}
-	#editorCanvas:hover{
-		border: 1px solid grey;
+		background: radial-gradient(rgb(162, 162, 162) 1px, transparent 1px);
+   		background-size : 20px 20px;
+		transition:0.5s;
+		background-color: rgb(241, 241, 241);
 	}
 </style>

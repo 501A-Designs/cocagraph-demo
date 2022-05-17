@@ -3,29 +3,23 @@
 	import '../app.css';
 </script>
 
-<Header />
+<!-- <Header /> -->
 
 <main>
 	<slot />
 </main>
 
-<footer>
+<!-- <footer>
 	<p>Designed and developed by <a href="https://501a.netlify.app">501A</a></p>
-</footer>
+</footer> -->
 
 <style>
 	main {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 1rem;
-		width: 100%;
-		max-width: 1024px;
-		margin: 0 auto;
-		box-sizing: border-box;
+		padding: 0;
+		margin: 0;
 	}
 
-	footer {
+	/* footer {
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
@@ -41,5 +35,5 @@
 		footer {
 			padding: 40px 0;
 		}
-	}
+	} */
 </style>
