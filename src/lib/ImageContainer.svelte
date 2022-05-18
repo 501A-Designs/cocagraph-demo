@@ -27,8 +27,8 @@
 	.draggableContainer {
         border-radius: 5px;
         padding: 5px;
-        background-color: white;
-        border: 2px solid white;
+        background-color: grey;
+        border: 1px solid white;
 		height: fit-content;
 		width: fit-content;
         display: flex;
@@ -37,7 +37,7 @@
         gap:5px;
 	}
     .draggableContainer:hover{
-        border: 2px solid blue;
+        border: 1px solid grey;
         cursor: all-scroll;
     }
     img{

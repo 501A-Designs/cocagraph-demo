@@ -1,5 +1,7 @@
 <script>
     import { textArray, connectionArray,isDragging } from "../store";
+    import Cut from "carbon-icons-svelte/lib/Cut.svelte";
+
     export let firstElementIndex,secondElementIndex, color, thickness, index;
     // console.log(firstElementLocation);
     let firstElementData = $textArray[firstElementIndex];
@@ -27,9 +29,28 @@
     `}
 >
     <button on:click={() => {
-        $connectionArray.splice(index,1);
+        let connectedNodes;
+
+        $connectionArray.map((obj) => {
+            if (obj.firstElementIndex == firstElementIndex && obj.secondElementIndex == secondElementIndex) {
+                connectedNodes = obj;
+            }
+        })
+        
+        let fCN = $textArray[connectedNodes.firstElementIndex];
+        let sCN = $textArray[connectedNodes.secondElementIndex];
+
+        let fCCN = fCN.connections.splice(connectedNodes.firstElementIndex,1)
+        let sCCN = sCN.connections.splice(connectedNodes.secondElementIndex,1)
+
+        console.log(fCCN, sCCN);
+
+        // let finalVersionArray = removedFirst[connectedNodes.secondElementIndex].connections.filter((f) => { return f !== connectedNodes.firstElementIndex })
+
+        // $textArray = finalVersionArray;
+        console.log($textArray);
         $connectionArray = $connectionArray;
-    }}>delete</button>
+    }}><Cut /></button>
 </div>
 
 <style>

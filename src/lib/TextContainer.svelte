@@ -1,18 +1,31 @@
 <script>
+    import { onMount } from 'svelte'
 	import { draggable } from '@neodrag/svelte'
 	import { textArray,connectionArray,isDragging } from '../store';
+
+    import {url, urlImage, urlYoutubeVideo} from '../regex';
+
     import ConnectionLine from './ConnectionLine.svelte';
-    export let text, x, y, index;
+
+    import TrashCan from "carbon-icons-svelte/lib/TrashCan.svelte";
+    import IbmCloudSubnets from "carbon-icons-svelte/lib/IbmCloudSubnets.svelte";
+    import ExamMode from "carbon-icons-svelte/lib/ExamMode.svelte";
+
+
+    export let text, x, y, index, connections;
 
     let showOnHover = false;
+
+    let beforeIndex = 0;
+    if (index !== 0) {
+        beforeIndex = index - 1;
+    }
 
     const createConnectionLine = (obj) => {
         $connectionArray = [...$connectionArray, obj];
     }
-
     const startingDrag = () =>{
         $isDragging = true;
-        console.log($isDragging);
     }
     const updateTextContainerLocation = (x,y) => {
 		$textArray = $textArray.map(obj => {
@@ -25,10 +38,7 @@
 			}
 			return obj;
 		});
-        console.log($textArray)
-        console.log(x,y)
 	};
-
 
     const updateTextContainerContent = () => {
 		let textContent = window.prompt(`new text?`, text);
@@ -45,15 +55,38 @@
         }
 	}
     const updateTextContainerConnection = () => {
-		let newConnection = window.prompt(`connection id? (must be number)`, 0);
-        if(newConnection !== null){
-            createConnectionLine({
-                firstElementIndex: index,
-                secondElementIndex: parseInt(newConnection)
-            })
+		let newConnection = window.prompt(`connection id? (must be number)`, beforeIndex);
+        if (parseInt(newConnection) !== index) {
+            if(newConnection !== null){
+                createConnectionLine({
+                    firstElementIndex: index,
+                    secondElementIndex: parseInt(newConnection)
+                })
+                $textArray[index].connections.push(parseInt(newConnection))
+                $textArray[parseInt(newConnection)].connections.push(index)
+            }
+        }else{
+            alert('you cannot run a connection to your own node')
         }
-        console.log($connectionArray)
 	};
+
+
+    let urlCheck = text.match(new RegExp(url))
+    let urlImageCheck = text.match(new RegExp(urlImage))
+    let urlYoutubeVideoCheck = text.match(new RegExp(urlYoutubeVideo))
+
+    let type;
+
+    if (urlCheck) {
+        type = 'url'
+        if (urlImageCheck) {
+            type = 'image';
+        } if (urlYoutubeVideoCheck) {
+            type = 'ytVideo';
+        }
+    }else{
+        type = 'text'
+    }
 </script>
     <!-- on:neodrag:start={(e) => {
         isDragging = true;
@@ -75,35 +108,51 @@
         updateTextContainerLocation(x,y);
     }}
 >
-    {#if showOnHover}
-        <div>
-            <strong style="color:white; background-color:grey; padding: 0 0.3em; border-radius: 2px; font-size:0.8em">note #{index}</strong>
-        </div>
+    <strong class={'tag'}>{index}</strong>
+
+
+    {#if type == "text"}
+        <p
+            style="text-align:left; margin: 5px; padding:0; user-select:none"
+        >
+            {text}
+        </p>
     {/if}
-    <p
-        style="text-align:left; margin:0; padding:0; user-select:none"
-    >
-        {text}
-    </p>
+    {#if type == "url"}
+        <a href={text} style="text-decoration:wavy; overflow-x:scroll">{text}</a>
+    {/if}
+    {#if type == "image"}
+        <!-- svelte-ignore a11y-img-redundant-alt -->
+        <img src={text} alt="no image"/>
+    {/if}
+    {#if type == "ytVideo"}
+        <iframe title="video link" src={'https://www.youtube.com/embed/' + text.split('=')[1]}/>
+    {/if}
+
+
     {#if showOnHover}
-        <div style="display:flex; align-items:center; gap:5px;">
-            <button 
-                on:click={() => {
-                        $textArray.splice(index,1);
-                        $textArray = $textArray;
+        <div style="display:flex; align-items:center; gap:5px;user-select:none;">
+            {#if connections.length == 0}
+                <button 
+                    on:click={() => {
+                            $textArray.splice(index,1);
+                            $textArray = $textArray;
+                            $connectionArray = $connectionArray;
+                        }
                     }
-                }
-            >
-                delete
-            </button>
+                >
+                    <TrashCan/>
+                </button>
+            {/if}
             <button 
                 on:click={() => {
                         updateTextContainerContent();
                         $textArray = $textArray;
                     }
                 }
+                title="update content"
             >
-                update
+                <ExamMode/>
             </button>
             <button 
                 on:click={() => {
@@ -111,33 +160,49 @@
                         $textArray = $textArray;
                     }
                 }
+                title="connect"
             >
-                connect
+                <IbmCloudSubnets/>
             </button>
         </div>
     {/if}
 </div>
 <style>
+    .tag{
+        position: absolute;
+        color:black;
+        background-color:var(--cocaOrange);
+        padding: 0.5em 1em;
+        border-radius: 20px;
+        font-size:0.8em;
+        user-select:none;
+        width:fit-content;
+        left: -15px;
+        top: -15px;
+    }
 	.draggableContainer {
         position: absolute;
-        border-radius: 0px 5px 5px 5px;
-        padding: 5px;
+        border-radius: 0px 10px 10px 10px;
+        padding: 10px;
         color: black;
         font-size:1em;
-        border: 1px solid transparent;
+        border: 1px solid var(--cocaOrange);
 		height: fit-content;
         width: fit-content;
 		max-width: 250px;
         display: flex;
         flex-direction: column;
         gap:5px;
-        border: 1px solid grey;
+        /* border: 1px solid rgb(190, 190, 190); */
         background-color: rgb(244, 244, 244);
         z-index: 10;
+        transition:0.05s;
 	}
     .draggableContainer:hover{
-        box-shadow: 0px 0px 10px rgb(191, 191, 191);
         cursor: all-scroll;
+    }
+    .draggableContainer:active{
+        box-shadow: 0px 0px 30px rgb(208, 208, 208);
     }
     button{
         cursor: pointer;
