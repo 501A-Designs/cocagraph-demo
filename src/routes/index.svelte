@@ -4,7 +4,7 @@
 
 <script>
 	// import Counter from '$lib/Counter.svelte';
-	import ImageContainer from '../lib/ImageContainer.svelte';
+
 	import TextContainer from '../lib/TextContainer.svelte';
 	import Footer from '../lib/Footer.svelte';
 	import * as animateScroll from "svelte-scrollto";
@@ -131,7 +131,7 @@
 </script>
 
 <svelte:head>
-	<title>Editor</title>
+	<title>cocagraph</title>
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 
@@ -177,6 +177,7 @@
 				<p>When uploading a local file to cocagraph, the data must be in a specific JSON file format.</p>
 				<ul>
 					<li><a href="/about">About</a></li>
+					<li><a href="/usage">JSON file format?</a></li>
 					<li><a href="https://github.com/501A-Designs/cocagraph" target="_blank">GitHub</a></li>
 					<li><a href="https://501a.netlify.app/" target="_blank">Developer Site</a></li>
 				</ul>
