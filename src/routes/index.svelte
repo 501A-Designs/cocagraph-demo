@@ -7,6 +7,7 @@
 	import ImageContainer from '../lib/ImageContainer.svelte';
 	import TextContainer from '../lib/TextContainer.svelte';
 	import Footer from '../lib/Footer.svelte';
+	import * as animateScroll from "svelte-scrollto";
 
 	import { onMount } from 'svelte';
 	import { textArray,connectionArray,isDragging } from '../store';
@@ -14,10 +15,16 @@
 
 	import Edit from "carbon-icons-svelte/lib/Edit.svelte";
 	import EditOff from "carbon-icons-svelte/lib/EditOff.svelte";
+	import FolderParent from "carbon-icons-svelte/lib/FolderParent.svelte";
+	import PinFilled from "carbon-icons-svelte/lib/PinFilled.svelte";
+	import CheckmarkOutline from "carbon-icons-svelte/lib/CheckmarkOutline.svelte";
 
+
+	import {urlImage} from '../regex'
 	
 	let locationX,locationY;
 	let editMode = false;
+	let mergingOnLocal = false;
 
 	const mouseLocation = (event) => {
 		locationX = event.offsetX;
@@ -27,6 +34,9 @@
 		$textArray = [...$textArray, obj];
 	}
 	const createTextContainer = () => {
+		if (uploadedFromLocal === true) {
+			mergingOnLocal = true;
+		}
 		if (editMode == true) {		
 			let textContent = window.prompt(`add text box`, 'Text goes here');
 			if(textContent !== null){
@@ -53,15 +63,15 @@
 		var loadImage = function (file) {
 			var reader = new FileReader();
 			reader.onload = function(e){
-				// addTextObject(
-				// 	{
-				// 		text:e.target.result,
-				// 		locationX:locationX,
-				// 		locationY:locationX,
-				// 		connections:[]
-				// 	}
-				// )
-				// console.log(e.target.result);
+				addTextObject(
+					{
+						text:e.target.result,
+						locationX:locationX,
+						locationY:locationX,
+						connections:[]
+					}
+				)
+				console.log(e.target.result);
 				console.log(file);
 			};
 			reader.readAsDataURL(file);
@@ -69,7 +79,7 @@
 		document.onpaste = function(e){
 			var items = e.clipboardData.items;
 			for (var i = 0; i < items.length; i++) {
-				if (IMAGE_MIME_REGEX.test(items[i].type)) {
+				if (urlImage.test(items[i].type)) {
 					loadImage(items[i].getAsFile());
 					return;
 				}
@@ -78,17 +88,43 @@
 		}
 	})
 
-	function getDarkColor() {
-		var color = '#';
-		for (var i = 0; i < 3; i++) {
-			color += Math.floor(Math.random() * 10);
+	let downloadJSONHref = '';
+	const saveAsJSON = () => {
+		let formatedJSON = {
+			'containerDataArray':$textArray,
+			'connectionLineLinks':$connectionArray,
 		}
-		return color;
+		downloadJSONHref = URL.createObjectURL(new Blob([JSON.stringify(formatedJSON, null, 2)], {type: "text/plain"}));
 	}
 
 	let scaleValue = 10;
 	if(scaleValue < 10){
 		editMode = false;
+	}
+
+	let file = null;
+
+	function beforeUnload() {
+		if ($textArray.length > 0) {
+			alert("Please save")
+		}
+	}
+
+	let openModal = false;
+	let uploadedFromLocal = false;
+	const updateDataFromJSON = async () =>{
+		let text = await file[0].text();
+		const importedData = JSON.parse(text);
+		importedData.containerDataArray.map(prop =>{
+			$textArray.push(prop);
+		})
+		importedData.connectionLineLinks.map(prop =>{
+			$connectionArray.push(prop);
+		})
+		$textArray = $textArray;
+		$connectionArray = $connectionArray;
+		openModal = false;
+		uploadedFromLocal = true;
 	}
 </script>
 
@@ -96,6 +132,44 @@
 	<title>Editor</title>
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
+
+<svelte:window on:beforeunload={beforeUnload}/> 
+
+{#if openModal}
+	<div id="modal">
+		<div class={'tag'} style={'padding: 0 1em ;'}>
+			<PinFilled/>
+			<p>Temporary Pin</p>
+		</div>
+		{#if file}
+			{#await file[0].text() then text}
+				<pre>{text}</pre>
+			{/await}
+			{:else}
+			<div style="margin-top:2em">
+				<strong>Nothing to preview</strong>
+				<p>When uploading a local file to cocagraph, the data must be in a specific JSON file format.</p>
+			</div>
+		{/if}
+		<div style={'display: flex; align-items: center;justify-content:space-between;'}>
+			<label>
+				<input type='file' bind:files={file}/>
+				<FolderParent size={20}/>
+				Upload JSON formated file
+			</label>
+			{#if file}
+				<button
+					class={'largeButton'}
+					title='Use this file'
+					on:click={()=>updateDataFromJSON()}
+				>
+					<CheckmarkOutline size={20}/>
+				</button>
+			{/if}
+		</div>
+	</div>
+{/if}
+
 <section
 	id="editorCanvas"
 	style={`transform:scale(${scaleValue/10})`}
@@ -126,7 +200,6 @@
 				secondElementIndex={connection.secondElementIndex}
 				color={'#a2a2a2'}
 				thickness={1}
-				index={$connectionArray.indexOf(connection)}
 			/>
 		{/each}
 	{/if}
@@ -150,7 +223,7 @@
 	<!-- <div>
 		<p style="margin:0;padding:0;">double click to create node</p>
 	</div> -->
-	<div style={'margin:0;padding:0;display:flex;gap:5px;'}>
+	<div style={'margin:0;padding:0;display:flex;gap:8px;'}>
 		{#if scaleValue === 10}
 			{#if editMode}
 				<button
@@ -172,16 +245,75 @@
 				</button>
 			{/if}
 		{/if}
-
 		{#if $textArray.length > 0}
-		<div class="buttonContainer">
-			<button>Save to cache</button>
-			<button>Convert to JSON</button>
-		</div>
+			<div class="buttonContainer">
+				<!-- <button class={'scaleHover'}>Save to cache</button> -->
+				{#if uploadedFromLocal}
+					{#if mergingOnLocal}
+						<button
+							class={'scaleHover'}
+							on:click={() => saveAsJSON()}
+						>
+							Convert to JSON
+						</button>
+					{/if}
+					{:else}
+					<button
+						class={'scaleHover'}
+						on:click={() => saveAsJSON()}
+					>
+						Convert to JSON
+					</button>
+				{/if}
+
+				{#if downloadJSONHref !== ''}
+					<a
+						href={downloadJSONHref}
+						download={`cocagraphData.txt`}
+						style="margin:0 1em; padding:0;"
+					>
+						Download JSON file
+					</a>
+				{/if}
+				{#if uploadedFromLocal}
+					{#if mergingOnLocal}
+						<p style="margin:0 1em; padding:0;">Added Node On Top Of Local</p>
+						{:else}
+						<p style="margin:0 1em; padding:0;">Uploaded From Local</p>
+					{/if}
+				{/if}
+
+			</div>
+		{/if}
+		{#if $textArray.length === 0}
+			<button
+				class="largeButton"
+				on:click|preventDefault={() => {
+					openModal=true;
+					animateScroll.scrollToTop();
+				}}
+			>
+				<FolderParent size={20}/>
+			</button>
 		{/if}
 	</div>
-
-	<input style="margin-right:5%" type="range" name="scale" bind:value={scaleValue} min="6" max="10">
+	{#if openModal}
+		<button
+			style="margin-right:5%"
+			on:click={() => openModal=false}
+		>
+			Close Pin
+		</button>
+		{:else}
+		<input
+			style="margin-right:5%"
+			type="range"
+			name="scale"
+			bind:value={scaleValue}
+			min="6"
+			max="10"
+		>
+	{/if}
 </Footer>
 
 <style>
@@ -218,15 +350,37 @@
 		height: 50px;
 		transition:0.5s;
 	}
-	.largeButton:hover{
+	.largeButton:hover,label:hover{
 		transform: translateY(-5px);
-		/* box-shadow: 0px 0px 30px #ffc87b; */
-		/* border-radius: 50px; */
+	}
+
+	input[type="file"] {
+		display: none;
+	}
+	label{
+		font-family: 'Space Grotesk', sans-serif;
+		user-select: none;
+		border:1px solid rgb(214, 214, 214);
+		background-color:rgb(214, 214, 214);
+		color: rgb(56, 56, 56);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap:8px;
+		cursor: pointer;
+		padding:0;
+		border-radius:15px;
+		border:1px solid rgb(234, 234, 234);
+		width: fit-content;
+		padding: 0 1.5em;
+		height: 48px;
+		transition:0.5s;
 	}
 
 	.buttonContainer {
 		display: flex;
 		gap:8px;
+		align-items: center;
 		border-radius:15px;
 		border:1px solid rgb(202, 202, 202);
 		padding:8px;

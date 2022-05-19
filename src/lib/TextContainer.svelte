@@ -70,7 +70,6 @@
         }
 	};
 
-
     let urlCheck = text.match(new RegExp(url))
     let urlImageCheck = text.match(new RegExp(urlImage))
     let urlYoutubeVideoCheck = text.match(new RegExp(urlYoutubeVideo))
@@ -108,7 +107,7 @@
         updateTextContainerLocation(x,y);
     }}
 >
-    <strong class={'tag'}>{index}</strong>
+    <strong class={'tag'} style={'padding: 0.5em 1em'}>{index}</strong>
 
 
     {#if type == "text"}
@@ -119,21 +118,25 @@
         </p>
     {/if}
     {#if type == "url"}
-        <a href={text} style="text-decoration:wavy; overflow-x:scroll">{text}</a>
+        <a href={text} style="text-decoration-style:wavy;text-decoration-color:var(--cocaOrange);overflow-x:scroll">{text}</a>
     {/if}
     {#if type == "image"}
         <!-- svelte-ignore a11y-img-redundant-alt -->
-        <img src={text} alt="no image"/>
+        <img
+            src={text}
+            alt="no image"
+        />
     {/if}
     {#if type == "ytVideo"}
-        <iframe title="video link" src={'https://www.youtube.com/embed/' + text.split('=')[1]}/>
+        <iframe class={'scaleHover'} title="video link" src={'https://www.youtube.com/embed/' + text.split('=')[1]}/>
     {/if}
 
 
     {#if showOnHover}
         <div style="display:flex; align-items:center; gap:5px;user-select:none;">
             {#if connections.length == 0}
-                <button 
+                <button
+                    class={'scaleHover'}
                     on:click={() => {
                             $textArray.splice(index,1);
                             $textArray = $textArray;
@@ -144,7 +147,8 @@
                     <TrashCan/>
                 </button>
             {/if}
-            <button 
+            <button
+                class={'scaleHover'}
                 on:click={() => {
                         updateTextContainerContent();
                         $textArray = $textArray;
@@ -155,6 +159,7 @@
                 <ExamMode/>
             </button>
             <button 
+                class={'scaleHover'}
                 on:click={() => {
                         updateTextContainerConnection();
                         $textArray = $textArray;
@@ -168,25 +173,13 @@
     {/if}
 </div>
 <style>
-    .tag{
-        position: absolute;
-        color:black;
-        background-color:var(--cocaOrange);
-        padding: 0.5em 1em;
-        border-radius: 20px;
-        font-size:0.8em;
-        user-select:none;
-        width:fit-content;
-        left: -15px;
-        top: -15px;
-    }
+
 	.draggableContainer {
         position: absolute;
         border-radius: 0px 10px 10px 10px;
         padding: 10px;
         color: black;
         font-size:1em;
-        border: 1px solid var(--cocaOrange);
 		height: fit-content;
         width: fit-content;
 		max-width: 250px;
@@ -194,6 +187,7 @@
         flex-direction: column;
         gap:5px;
         /* border: 1px solid rgb(190, 190, 190); */
+        border: 1px solid var(--cocaOrange);
         background-color: rgb(244, 244, 244);
         z-index: 10;
         transition:0.05s;

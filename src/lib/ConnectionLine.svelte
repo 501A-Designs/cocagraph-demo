@@ -2,7 +2,7 @@
     import { textArray, connectionArray,isDragging } from "../store";
     import Cut from "carbon-icons-svelte/lib/Cut.svelte";
 
-    export let firstElementIndex,secondElementIndex, color, thickness, index;
+    export let firstElementIndex,secondElementIndex, color, thickness;
     // console.log(firstElementLocation);
     let firstElementData = $textArray[firstElementIndex];
     let secondElementData = $textArray[secondElementIndex];

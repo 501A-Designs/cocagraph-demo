@@ -5,7 +5,7 @@
 
 <!-- <Header /> -->
 
-<main>
+<main onunload="con();">
 	<slot />
 </main>
 
