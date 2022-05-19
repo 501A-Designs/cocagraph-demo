@@ -12,3 +12,5 @@ The easiest way you can save your data at any time is by caching it to your brow
 2. Saving as a JSON object
 
 Another way you can save your data is by downloading it on your computer as a `.txt` file. The `.txt` file contains a JSON object with every note and connection information saved, so when you open cocagraph on a different computer, you can import the file you saved on a different machine and view your data. Once opened on cocagraphm you can also add new nodes on top of it and download it as a new file.
+
+## JSON object structure

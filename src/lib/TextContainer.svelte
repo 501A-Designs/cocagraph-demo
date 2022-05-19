@@ -118,7 +118,7 @@
         </p>
     {/if}
     {#if type == "url"}
-        <a href={text} style="text-decoration-style:wavy;text-decoration-color:var(--cocaOrange);overflow-x:scroll">{text}</a>
+        <a href={text} style="overflow-x:scroll">{text}</a>
     {/if}
     {#if type == "image"}
         <!-- svelte-ignore a11y-img-redundant-alt -->

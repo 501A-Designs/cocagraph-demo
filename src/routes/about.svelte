@@ -19,26 +19,23 @@
 	<meta name="description" content="About this app" />
 </svelte:head>
 
-<div class="content">
+<div style="padding:5% 10%;">
 	<h1>about</h1>
 	<p>
-		welcome to cocagraph. its the note taking idea sketch pad for those take notes but don't really care whether they lose it or not. cocagraph is built using svelte kit and gun.js.
+		welcome to cocagraph.
+		<br/>
+		<br/>
+		you can call it a lot of things. a note book, idea pad, sketch pad, brainstorming chart, relational chart, anything you wish it to be!
 	</p>
+	<h2>underlying technology</h2>
 	<p>
-		The page you're looking at is purely static HTML, with no client-side interactivity needed.
-		Because of that, we don't need to load any JavaScript. Try viewing the page's source, or opening
-		the devtools network panel and reloading.
+		cocagraph is built using svelte kit, with no backend. anybody can open the app and instantly use it. users can save their graph data as JSON objects and open them back in cocagraph for further editing and spinoffs. to see how cocagraph works under the hood, you can check out its <a href="https://github.com/501A-Designs/cocagraph" target="_blank">GitHub repository</a> which is open for anybody to see.
 	</p>
+	<h2>getting started</h2>
 	<p>
-		The <a href="/todos">TODOs</a> page illustrates SvelteKit's data loading and form handling. Try using
-		it with JavaScript disabled!
+		The <a href="/">editor</a> page is where you can get started in no time! no login is required
 	</p>
 </div>
 
 <style>
-	.content {
-		width: 100%;
-		max-width: var(--column-width);
-		margin: var(--column-margin-top) auto 0 auto;
-	}
 </style>

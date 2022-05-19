@@ -95,6 +95,7 @@
 			'connectionLineLinks':$connectionArray,
 		}
 		downloadJSONHref = URL.createObjectURL(new Blob([JSON.stringify(formatedJSON, null, 2)], {type: "text/plain"}));
+		console.log(downloadJSONHref);
 	}
 
 	let scaleValue = 10;
@@ -103,6 +104,7 @@
 	}
 
 	let file = null;
+	let modalType;
 
 	function beforeUnload() {
 		if ($textArray.length > 0) {
@@ -141,69 +143,82 @@
 			<PinFilled/>
 			<p>Temporary Pin</p>
 		</div>
-		{#if file}
-			{#await file[0].text() then text}
-				<pre>{text}</pre>
-			{/await}
-			{:else}
-			<div style="margin-top:2em">
-				<strong>Nothing to preview</strong>
-				<p>When uploading a local file to cocagraph, the data must be in a specific JSON file format.</p>
+		{#if modalType == 'uploadLocalData'}
+			{#if file}
+				{#await file[0].text() then text}
+					<pre style="margin-top:2em">{text}</pre>
+				{/await}
+				{:else}
+				<div style="margin-top:2em">
+					<strong>Nothing to preview</strong>
+					<p>When uploading a local file to cocagraph, the data must be in a specific JSON file format.</p>
+				</div>
+			{/if}
+			<div style={'display: flex; align-items: center;justify-content:space-between;'}>
+				<label>
+					<input type='file' bind:files={file}/>
+					<FolderParent size={20}/>
+					Upload JSON formated file
+				</label>
+				{#if file}
+					<button
+						class={'largeButton'}
+						title='Use this file'
+						on:click={()=>updateDataFromJSON()}
+					>
+						<CheckmarkOutline size={20}/>
+					</button>
+				{/if}
 			</div>
 		{/if}
-		<div style={'display: flex; align-items: center;justify-content:space-between;'}>
-			<label>
-				<input type='file' bind:files={file}/>
-				<FolderParent size={20}/>
-				Upload JSON formated file
-			</label>
-			{#if file}
-				<button
-					class={'largeButton'}
-					title='Use this file'
-					on:click={()=>updateDataFromJSON()}
-				>
-					<CheckmarkOutline size={20}/>
-				</button>
-			{/if}
-		</div>
+		{#if modalType == 'navigation'}
+			<div style="margin-top:2em">
+				<strong>Navigation</strong>
+				<p>When uploading a local file to cocagraph, the data must be in a specific JSON file format.</p>
+				<ul>
+					<li><a href="/about">About</a></li>
+					<li><a href="https://github.com/501A-Designs/cocagraph" target="_blank">GitHub</a></li>
+					<li><a href="https://501a.netlify.app/" target="_blank">Developer Site</a></li>
+				</ul>
+			</div>
+		{/if}
 	</div>
 {/if}
 
-<section
-	id="editorCanvas"
-	style={`transform:scale(${scaleValue/10})`}
-	on:mousemove={(e) => mouseLocation(e)}
->
-	<!-- on:click={() => createTextContainer()} -->
-	<!-- {#each $imageArray as image}
-		<ImageContainer
-			src={image.src}
-			x={image.x}
-			y={image.y}
-			index={$imageArray.indexOf(imageUrl)}
-		/>
-	{/each} -->
-	{#each $textArray as text}
-		<TextContainer
-			text={text.text}
-			x={text.locationX}
-			y={text.locationY}
-			index={$textArray.indexOf(text)}
-			connections={text.connections}
-		/>
-	{/each}
-	{#if $textArray.length > 1 && !$isDragging}
-		{#each $connectionArray as connection}
-			<ConnectionLine
-				firstElementIndex={connection.firstElementIndex}
-				secondElementIndex={connection.secondElementIndex}
-				color={'#a2a2a2'}
-				thickness={1}
+<div style="padding:0; margin:0; overflow-x:scroll;">
+	<!-- // translateX(-${scaleValue/15}%) -->
+	<section
+		id="editorCanvas"
+		style={`
+			transform:
+			scale(${scaleValue/10})
+			translateY(-${scaleValue/10}px)
+		`}
+		on:mousemove={(e) => mouseLocation(e)}
+	>
+		{#each $textArray as text}
+			<TextContainer
+				text={text.text}
+				x={text.locationX}
+				y={text.locationY}
+				index={$textArray.indexOf(text)}
+				connections={text.connections}
 			/>
 		{/each}
-	{/if}
-</section>
+		{#if $textArray.length > 1 && !$isDragging}
+			{#each $connectionArray as connection}
+				<ConnectionLine
+					firstElementIndex={connection.firstElementIndex}
+					secondElementIndex={connection.secondElementIndex}
+					color={'var(--cocaOrange)'}
+					thickness={2}
+				/>
+				<!-- #a2a2a2 -->
+			{/each}
+		{/if}
+	</section>
+</div>
+
 {#if scaleValue === 10}
 	{#if editMode}
 		<div
@@ -219,16 +234,24 @@
 	{/if}
 {/if}
 <Footer>
-	<h1 style="margin-left:5%">cocagraph</h1>
-	<!-- <div>
-		<p style="margin:0;padding:0;">double click to create node</p>
-	</div> -->
+	<h1
+		style="margin-left:5%; cursor:pointer;"
+		on:click|preventDefault={() => {
+			modalType='navigation';
+			openModal=true;
+			animateScroll.scrollToTop();
+		}}
+	>
+		cocagraph
+	</h1>
 	<div style={'margin:0;padding:0;display:flex;gap:8px;'}>
 		{#if scaleValue === 10}
 			{#if editMode}
 				<button
 					class="largeButton"
-					style={`background-color:var(--cocaOrange);color: white;`}
+					style={`
+						background-color:var(--cocaOrange);
+					`}
 					on:click={() => editMode = false}
 					title="Turn off edit mode"
 				>
@@ -237,7 +260,6 @@
 				{:else}
 				<button
 					class="largeButton"
-					style={`background-color:rgb(214, 214, 214);color: black;`}
 					on:click={() => editMode = true}
 					title="Enable edit mode"
 				>
@@ -285,10 +307,11 @@
 
 			</div>
 		{/if}
-		{#if $textArray.length === 0}
+		{#if $textArray.length === 0 && scaleValue === 10}
 			<button
 				class="largeButton"
 				on:click|preventDefault={() => {
+					modalType='uploadLocalData';
 					openModal=true;
 					animateScroll.scrollToTop();
 				}}
@@ -319,19 +342,21 @@
 <style>
 	.pointerButton{
 		z-index: 20;
-		background: radial-gradient(circle at center, #ffd9a4c1 0, transparent 60%);
+		opacity: 0.2;
+		background: radial-gradient(circle at center, var(--cocaOrange) 0, transparent 60%);
 		width:150px;
 		height:150px;
 		border-radius:50px;
 		cursor: pointer;
-		transition:0.3s;
+		transition:0.2s;
 	}
 	.pointerButton:hover{
-		background: radial-gradient(circle at center, #ffc370c1 0, transparent 60%);
+		opacity: 0.5;
+		background: radial-gradient(circle at center, var(--cocaOrange) 0, transparent 60%);
 	}
 	#editorCanvas {
-		width: 3000px;
-		height: 3000px;
+		width: 2000px;
+		height: 1500px;
 		margin: 0;
 		padding: 0;
 		border-radius: 15px;
@@ -350,6 +375,7 @@
 		height: 50px;
 		transition:0.5s;
 	}
+
 	.largeButton:hover,label:hover{
 		transform: translateY(-5px);
 	}
