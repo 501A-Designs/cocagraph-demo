@@ -12,7 +12,6 @@
     footer{
         position:fixed;
         z-index: 20;
-        
         bottom:0;
         padding: 1em;
         width: 100%;

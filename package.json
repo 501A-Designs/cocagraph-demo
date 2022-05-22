@@ -25,6 +25,7 @@
     "@neodrag/svelte": "^1.1.4",
     "carbon-icons-svelte": "^11.0.1",
     "cookie": "^0.4.1",
+    "moment": "^2.29.3",
     "svelte-moveable": "^0.21.8",
     "svelte-scrollto": "^0.2.0"
   }

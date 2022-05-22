@@ -4,14 +4,16 @@
 
 <script>
 	// import Counter from '$lib/Counter.svelte';
+	import moment from 'moment';
 
 	import TextContainer from '../lib/TextContainer.svelte';
 	import Footer from '../lib/Footer.svelte';
 	import * as animateScroll from "svelte-scrollto";
 
 	import { onMount } from 'svelte';
-	import { textArray,connectionArray,isDragging } from '../store';
+	import { metaData,textArray,connectionArray,zoneArray,isDragging } from '../store';
 	import ConnectionLine from '../lib/ConnectionLine.svelte';
+	import Zone from "../lib/Zone.svelte"
 
 	import Edit from "carbon-icons-svelte/lib/Edit.svelte";
 	import EditOff from "carbon-icons-svelte/lib/EditOff.svelte";
@@ -54,11 +56,6 @@
 		}
 	}
 
-	// const removeObject = (index,array) => {
-	// 	array.splice(index,1);
-	// 	console.log(array);
-	// }
-
 	onMount(() => {
 		var loadImage = function (file) {
 			var reader = new FileReader();
@@ -88,9 +85,20 @@
 		}
 	})
 
+	const saveMetaData = () =>{
+		openModal=false;
+		let cocagraphTitle = window.prompt(`set a title for your cocagraph`, 'Title goes here');
+		if(cocagraphTitle !== null){
+			$metaData.name = cocagraphTitle;
+			$metaData.date = moment().format('MMMM Do YYYY, h:mm:ss a')
+		}
+		console.log($metaData)
+	}
+
 	let downloadJSONHref = '';
 	const saveAsJSON = () => {
 		let formatedJSON = {
+			'cocagraphMetaData':$metaData,
 			'containerDataArray':$textArray,
 			'connectionLineLinks':$connectionArray,
 		}
@@ -117,6 +125,7 @@
 	const updateDataFromJSON = async () =>{
 		let text = await file[0].text();
 		const importedData = JSON.parse(text);
+		$metaData.name = importedData.cocagraphMetaData.name;
 		importedData.containerDataArray.map(prop =>{
 			$textArray.push(prop);
 		})
@@ -127,6 +136,11 @@
 		$connectionArray = $connectionArray;
 		openModal = false;
 		uploadedFromLocal = true;
+	}
+
+	$: if ($metaData.name === 'untitled'){
+		modalType='navigation';
+		openModal=true;
 	}
 </script>
 
@@ -150,8 +164,8 @@
 				{/await}
 				{:else}
 				<div style="margin-top:2em">
-					<strong>Nothing to preview</strong>
-					<p>When uploading a local file to cocagraph, the data must be in a specific JSON file format.</p>
+					<strong>Upload a locally saved cocagraph</strong>
+					<p>When uploading a local file to cocagraph, the data must be in a specific JSON file format. More about this format can be found in the <a href="/usage">usage page</a>.</p>
 				</div>
 			{/if}
 			<div style={'display: flex; align-items: center;justify-content:space-between;'}>
@@ -173,30 +187,35 @@
 		{/if}
 		{#if modalType == 'navigation'}
 			<div style="margin-top:2em">
-				<strong>Navigation</strong>
-				<p>When uploading a local file to cocagraph, the data must be in a specific JSON file format.</p>
-				<ul>
-					<li><a href="/about">About</a></li>
-					<li><a href="/usage">JSON file format?</a></li>
-					<li><a href="https://github.com/501A-Designs/cocagraph" target="_blank">GitHub</a></li>
-					<li><a href="https://501a.netlify.app/" target="_blank">Developer Site</a></li>
-				</ul>
+				<strong>Welcome!</strong>
+				<p>Thanks for trying out cocagraph! Below are the following steps you can take to get started using it!</p>
+				<ol>
+					<li>Click the 'untitled' text on the bottom left of the screen to set the title of your cocagraph</li>
+					<li>After naming your cocagraph, you can click the pen mark to start edit mode, which will enable you add nodes. (Click the pen mark again to disable edit mode)</li>
+					<li>Start getting creative!</li>
+				</ol>
 			</div>
 		{/if}
 	</div>
 {/if}
 
-<div style="padding:0; margin:0; overflow-x:scroll;">
-	<!-- // translateX(-${scaleValue/15}%) -->
+<!-- <div style="padding:0; margin:0; overflow-x:scroll;"> -->
+	<!-- translateZ(-${scaleValue/10}px) -->
+	<!-- scaleZ(${scaleValue/10}) -->
 	<section
 		id="editorCanvas"
-		style={`
-			transform:
-			scale(${scaleValue/10})
-			translateY(-${scaleValue/10}px)
-		`}
+		style={`transform:scale(${scaleValue/10})`}
 		on:mousemove={(e) => mouseLocation(e)}
 	>
+		{#each $zoneArray as zone}
+			<Zone
+				name={zone.name}
+				x={zone.locationX}
+				y={zone.locationY}
+				nodeInZoneIndex={zone.nodeInZoneIndex}
+				index={$zoneArray.indexOf(zone)}
+			/>
+		{/each}
 		{#each $textArray as text}
 			<TextContainer
 				text={text.text}
@@ -218,7 +237,7 @@
 			{/each}
 		{/if}
 	</section>
-</div>
+<!-- </div> -->
 
 {#if scaleValue === 10}
 	{#if editMode}
@@ -227,26 +246,25 @@
 			style={`
 				position:absolute;
 				z-index:10;
-				left:${locationX-70}px;
-				top:${locationY-70}px;
+				left:${locationX-50}px;
+				top:${locationY+15}px;
 			`}
 			on:click={() => createTextContainer()}
 		/>
 	{/if}
 {/if}
 <Footer>
+		<!-- on:click|preventDefault={() => {
+
+		}} -->
 	<h1
 		style="margin-left:5%; cursor:pointer;"
-		on:click|preventDefault={() => {
-			modalType='navigation';
-			openModal=true;
-			animateScroll.scrollToTop();
-		}}
+		on:click={() => saveMetaData()}
 	>
-		cocagraph
+		{$metaData.name}
 	</h1>
 	<div style={'margin:0;padding:0;display:flex;gap:8px;'}>
-		{#if scaleValue === 10}
+		{#if scaleValue === 10 && $metaData.name !== 'untitled'}
 			{#if editMode}
 				<button
 					class="largeButton"
@@ -270,7 +288,6 @@
 		{/if}
 		{#if $textArray.length > 0}
 			<div class="buttonContainer">
-				<!-- <button class={'scaleHover'}>Save to cache</button> -->
 				{#if uploadedFromLocal}
 					{#if mergingOnLocal}
 						<button
@@ -290,6 +307,11 @@
 				{/if}
 
 				{#if downloadJSONHref !== ''}
+					<button
+						class={'scaleHover'}
+					>
+						Copy JSON
+					</button>
 					<a
 						href={downloadJSONHref}
 						download={`cocagraphData.txt`}
@@ -343,26 +365,27 @@
 <style>
 	.pointerButton{
 		z-index: 20;
-		opacity: 0.2;
+		opacity: 0;
 		background: radial-gradient(circle at center, var(--cocaOrange) 0, transparent 60%);
-		width:150px;
-		height:150px;
+		width:80px;
+		height:80px;
 		border-radius:50px;
 		cursor: pointer;
 		transition:0.2s;
 	}
 	.pointerButton:hover{
-		opacity: 0.5;
+		opacity: 0.6;
 		background: radial-gradient(circle at center, var(--cocaOrange) 0, transparent 60%);
 	}
 	#editorCanvas {
-		width: 2000px;
-		height: 1500px;
+		max-width: 1500px;
+		width: 100%;
+		height: 2000px;
 		margin: 0;
 		padding: 0;
 		border-radius: 15px;
 		background: radial-gradient(rgb(162, 162, 162) 1px, transparent 1px);
-   		background-size : 20px 20px;
+   		background-size : 20px 20px;;
 		box-shadow:0px 0px 35px rgb(214, 214, 214);
 		border: 1px solid rgb(192, 192, 192);
 		transition:0.5s;

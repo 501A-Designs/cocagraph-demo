@@ -1,7 +1,7 @@
 <script>
     import { onMount } from 'svelte'
 	import { draggable } from '@neodrag/svelte'
-	import { textArray,connectionArray,isDragging } from '../store';
+	import { textArray,connectionArray,zoneArray,isDragging } from '../store';
 
     import {url, urlImage, urlYoutubeVideo} from '../regex';
 
@@ -10,6 +10,7 @@
     import TrashCan from "carbon-icons-svelte/lib/TrashCan.svelte";
     import IbmCloudSubnets from "carbon-icons-svelte/lib/IbmCloudSubnets.svelte";
     import ExamMode from "carbon-icons-svelte/lib/ExamMode.svelte";
+    import Grid from "carbon-icons-svelte/lib/Grid.svelte";
 
 
     export let text, x, y, index, connections;
@@ -86,11 +87,25 @@
     }else{
         type = 'text'
     }
+
+    const newZone = (obj) =>{
+        $zoneArray = [...$zoneArray, obj];
+    }
+    const createZone = () => {
+        let zoneName = window.prompt(`create zone`, 'Zone Name');
+        if(zoneName !== null){
+            newZone({
+                name:zoneName,
+                locationX:x - 50,
+                locationY:y - 50,
+                nodeInZoneIndex:[]
+            })
+        }
+    }
 </script>
-    <!-- on:neodrag:start={(e) => {
-        isDragging = true;
-    }} -->
+
 <div
+    id={`${index}-node`}
     class="draggableContainer"
     use:draggable={{ position: { x, y } }}
     on:mouseenter={() => showOnHover = true}
@@ -98,8 +113,6 @@
     on:neodrag={() => {startingDrag()}}
     on:neodrag:end={(e) => {
         $isDragging = false;
-        console.log(e.detail.offsetX,e.detail.offsetY);
-        console.log(x,y)
         if (e.detail.offsetX != 0 && e.detail.offsetY != 0) {
             x = e.detail.offsetX;
             y = e.detail.offsetY;
@@ -143,9 +156,20 @@
                             $connectionArray = $connectionArray;
                         }
                     }
+                    title="delete node"
                 >
                     <TrashCan/>
                 </button>
+                <button
+                    class={'scaleHover'}
+                    on:click={() => {
+                            createZone();
+                        }
+                    }
+                    title="create zone"
+                >
+                <Grid/>
+            </button>
             {/if}
             <button
                 class={'scaleHover'}
