@@ -142,6 +142,10 @@
 		modalType='navigation';
 		openModal=true;
 	}
+
+	$zoneArray.map(prop =>{
+		console.log(prop)
+	})
 </script>
 
 <svelte:head>
@@ -151,9 +155,24 @@
 
 <svelte:window on:beforeunload={beforeUnload}/> 
 
+{#if scaleValue === 10}
+	{#if editMode}
+		<div
+			class="pointerButton"
+			style='
+				position:absolute;
+				z-index:10;
+				left:{locationX - 40}px;
+				top:{locationY + 20}px;
+			'
+			on:click={() => createTextContainer()}
+		/>
+	{/if}
+{/if}
+
 {#if openModal}
 	<div id="modal">
-		<div class={'tag'} style={'padding: 0 1em ;'}>
+		<div class={'tag'} style={'padding: 0 1em;'}>
 			<PinFilled/>
 			<p>Temporary Pin</p>
 		</div>
@@ -199,12 +218,14 @@
 	</div>
 {/if}
 
-<!-- <div style="padding:0; margin:0; overflow-x:scroll;"> -->
+<div
+	style="padding:0; margin:0; overflow-x:scroll; border-radius:15px;"
+>
 	<!-- translateZ(-${scaleValue/10}px) -->
 	<!-- scaleZ(${scaleValue/10}) -->
 	<section
 		id="editorCanvas"
-		style={`transform:scale(${scaleValue/10})`}
+		style={`transform:scale(${scaleValue/10});`}
 		on:mousemove={(e) => mouseLocation(e)}
 	>
 		{#each $zoneArray as zone}
@@ -237,22 +258,7 @@
 			{/each}
 		{/if}
 	</section>
-<!-- </div> -->
-
-{#if scaleValue === 10}
-	{#if editMode}
-		<div
-			class="pointerButton"
-			style={`
-				position:absolute;
-				z-index:10;
-				left:${locationX-50}px;
-				top:${locationY+15}px;
-			`}
-			on:click={() => createTextContainer()}
-		/>
-	{/if}
-{/if}
+</div>
 <Footer>
 		<!-- on:click|preventDefault={() => {
 
@@ -373,19 +379,22 @@
 		cursor: pointer;
 		transition:0.2s;
 	}
+
 	.pointerButton:hover{
 		opacity: 0.6;
 		background: radial-gradient(circle at center, var(--cocaOrange) 0, transparent 60%);
 	}
+
 	#editorCanvas {
-		max-width: 1500px;
-		width: 100%;
+		/* width: 100%; */
+		/* max-width: 1000px; */
+		width:2000px;
 		height: 2000px;
 		margin: 0;
 		padding: 0;
 		border-radius: 15px;
 		background: radial-gradient(rgb(162, 162, 162) 1px, transparent 1px);
-   		background-size : 20px 20px;;
+   		background-size : 20px 20px;
 		box-shadow:0px 0px 35px rgb(214, 214, 214);
 		border: 1px solid rgb(192, 192, 192);
 		transition:0.5s;
