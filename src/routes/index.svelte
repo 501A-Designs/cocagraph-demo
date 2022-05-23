@@ -95,12 +95,14 @@
 		console.log($metaData)
 	}
 
+	let formatedJSON;
 	let downloadJSONHref = '';
 	const saveAsJSON = () => {
-		let formatedJSON = {
+		formatedJSON = {
 			'cocagraphMetaData':$metaData,
 			'containerDataArray':$textArray,
 			'connectionLineLinks':$connectionArray,
+			'zoneDataArray':$zoneArray
 		}
 		downloadJSONHref = URL.createObjectURL(new Blob([JSON.stringify(formatedJSON, null, 2)], {type: "text/plain"}));
 		console.log(downloadJSONHref);
@@ -126,14 +128,24 @@
 		let text = await file[0].text();
 		const importedData = JSON.parse(text);
 		$metaData.name = importedData.cocagraphMetaData.name;
-		importedData.containerDataArray.map(prop =>{
-			$textArray.push(prop);
-		})
-		importedData.connectionLineLinks.map(prop =>{
-			$connectionArray.push(prop);
-		})
+		if (importedData.containerDataArray) {			
+			importedData.containerDataArray.map(prop =>{
+				$textArray.push(prop);
+			})
+		}
+		if (importedData.connectionLineLinks) {			
+			importedData.connectionLineLinks.map(prop =>{
+				$connectionArray.push(prop);
+			})
+		}
+		if (importedData.zoneDataArray) {			
+			importedData.zoneDataArray.map(prop =>{
+				$zoneArray.push(prop);
+			})
+		}
 		$textArray = $textArray;
 		$connectionArray = $connectionArray;
+		$zoneArray = $zoneArray;
 		openModal = false;
 		uploadedFromLocal = true;
 	}
@@ -142,10 +154,6 @@
 		modalType='navigation';
 		openModal=true;
 	}
-
-	$zoneArray.map(prop =>{
-		console.log(prop)
-	})
 </script>
 
 <svelte:head>
@@ -215,17 +223,24 @@
 				</ol>
 			</div>
 		{/if}
+		{#if modalType == 'convertedJSON'}
+			<div style="margin-top:2em">
+				<strong>Converted JSON</strong>
+				<p>Below is the cocagraph you have made represented as a JSON object. If you don't want to download your data as a new file you can just copy and paste it on top of your existing file or create a new .txt file and paste it there.</p>
+				<pre>
+					{JSON.stringify(formatedJSON, null, 2)}
+				</pre>
+			</div>
+		{/if}
 	</div>
 {/if}
 
 <div
 	style="padding:0; margin:0; overflow-x:scroll; border-radius:15px;"
 >
-	<!-- translateZ(-${scaleValue/10}px) -->
-	<!-- scaleZ(${scaleValue/10}) -->
 	<section
 		id="editorCanvas"
-		style={`transform:scale(${scaleValue/10});`}
+		style='transform:scale({scaleValue/10});'
 		on:mousemove={(e) => mouseLocation(e)}
 	>
 		{#each $zoneArray as zone}
@@ -315,8 +330,13 @@
 				{#if downloadJSONHref !== ''}
 					<button
 						class={'scaleHover'}
+						on:click|preventDefault={() => {
+							modalType='convertedJSON';
+							openModal=true;
+							animateScroll.scrollToTop();
+						}}
 					>
-						Copy JSON
+						View JSON
 					</button>
 					<a
 						href={downloadJSONHref}
