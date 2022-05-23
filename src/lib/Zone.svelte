@@ -96,19 +96,19 @@
 
         let nodeInZoneWidth;
         let nodeInZoneHeight;
-        let innerObjectLocationX;
-        let innerObjectLocationY;
+        let objectLocationX;
+        let objectLocationY;
 
         $textArray.map(obj => {
-            innerObjectLocationX = obj.locationX;
-            innerObjectLocationY = obj.locationY; 
+            objectLocationX = obj.locationX;
+            objectLocationY = obj.locationY; 
 
             // console.log(`${x} < Xrange < ${zoneWidth+x}, ${y} < Yrange < ${zoneHeight+y}`)
             if (
-                innerObjectLocationX > x &&
-                innerObjectLocationX < zoneWidth+x && 
-                innerObjectLocationY > y &&
-                innerObjectLocationY < zoneHeight+y
+                objectLocationX > x &&
+                objectLocationX < zoneWidth+x && 
+                objectLocationY > y &&
+                objectLocationY < zoneHeight+y
             ) {
                 // let nodeInZone = obj;
                 // let nodeInZoneIndex = $textArray.indexOf(nodeInZone);
@@ -130,6 +130,7 @@
             $textArray.map(obj => {
                 if (obj.locationX === getMaxX) {
                     maxXIndex = $textArray.indexOf(obj);
+                    console.log(obj);
                 }
             })
 
@@ -144,10 +145,15 @@
             nodeInZoneWidth = document.getElementById(`${maxXIndex}-node`).clientWidth;
             nodeInZoneHeight = document.getElementById(`${maxYIndex}-node`).clientHeight;
 
-            console.log(innerObjectLocationX)
+            console.log(maxXIndex,maxYIndex);
 
-            zoneWidth =  (innerObjectLocationX - x) + (nodeInZoneWidth + 40);
-            zoneHeight =  (innerObjectLocationY - y) + (nodeInZoneHeight + 40);
+            console.log((getMaxX - x) + (nodeInZoneWidth + 40))
+            console.log((getMaxY - y) + (nodeInZoneHeight + 40))
+
+
+
+            zoneWidth =  (getMaxX - x) + (nodeInZoneWidth + 30);
+            zoneHeight =  (getMaxY - y) + (nodeInZoneHeight + 30);
         } else{
             zoneWidth = 150;
             zoneHeight = 150;
