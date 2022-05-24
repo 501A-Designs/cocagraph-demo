@@ -244,15 +244,6 @@
 		style='transform:scale({scaleValue/10});'
 		on:mousemove={(e) => mouseLocation(e)}
 	>
-		{#each $zoneArray as zone}
-			<Zone
-				name={zone.name}
-				x={zone.locationX}
-				y={zone.locationY}
-				nodeInZoneIndex={zone.nodeInZoneIndex}
-				index={$zoneArray.indexOf(zone)}
-			/>
-		{/each}
 		{#each $textArray as text}
 			<TextContainer
 				text={text.text}
@@ -273,12 +264,18 @@
 				/>
 			{/each}
 		{/if}
+		{#each $zoneArray as zone}
+			<Zone
+				name={zone.name}
+				x={zone.locationX}
+				y={zone.locationY}
+				nodeInZoneIndex={zone.nodeInZoneIndex}
+				index={$zoneArray.indexOf(zone)}
+			/>
+		{/each}
 	</section>
 </div>
 <Footer>
-		<!-- on:click|preventDefault={() => {
-
-		}} -->
 	<h1
 		style="margin-left:5%; cursor:pointer;"
 		on:click={() => saveMetaData()}
@@ -355,7 +352,6 @@
 						<p style="margin:0 1em; padding:0;">Uploaded From Local</p>
 					{/if}
 				{/if}
-
 			</div>
 		{/if}
 		{#if $textArray.length === 0 && scaleValue === 10}
@@ -402,15 +398,11 @@
 		cursor: pointer;
 		transition:0.2s;
 	}
-
 	.pointerButton:hover{
 		opacity: 0.6;
 		background: radial-gradient(circle at center, var(--cocaOrange) 0, transparent 60%);
 	}
-
 	#editorCanvas {
-		/* width: 100%; */
-		/* max-width: 1000px; */
 		width:2000px;
 		height: 2000px;
 		margin: 0;
@@ -423,7 +415,6 @@
 		transition:0.5s;
 		background-color: rgb(233, 231, 225);
 	}
-
 	.largeButton{
 		border-radius:15px;
 		border:1px solid rgb(234, 234, 234);
@@ -431,11 +422,9 @@
 		height: 50px;
 		transition:0.5s;
 	}
-
 	.largeButton:hover,label:hover{
 		transform: translateY(-5px);
 	}
-
 	input[type="file"] {
 		display: none;
 	}

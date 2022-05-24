@@ -1,7 +1,6 @@
 <script>
 	import { draggable } from '@neodrag/svelte'
 	import { textArray,zoneArray,isDragging } from '../store';
-
     export let name, x, y, index, nodeInZoneIndex;
 
     const startingDrag = () =>{
@@ -19,21 +18,6 @@
 			return obj;
 		});
 	};
-    // $:console.log($zoneArray);
-    // const updateTextContainerContent = () => {
-	// 	let textContent = window.prompt(`new text?`, text);
-    //     if(textContent !== null){
-    //         $textArray = $textArray.map(obj => {
-    //             if ($textArray.indexOf(obj) === index) {
-    //                 return {
-    //                     ...obj,
-    //                     text:textContent,
-    //                 };
-    //             }
-    //             return obj;
-    //         });
-    //     }
-	// }
 
     let zoneWidth = 150;
     let zoneHeight = 150;
@@ -43,7 +27,6 @@
         let nodeInZoneHeight;
         let objectLocationX;
         let objectLocationY;
-
         $textArray.map(obj => {
             objectLocationX = obj.locationX;
             objectLocationY = obj.locationY; 
@@ -70,7 +53,6 @@
                     console.log(obj);
                 }
             })
-
             let maxYIndex;
             let getMaxY = Math.max(...nodeInZoneIndex.map(index => $textArray[index].locationY));
             $textArray.map(obj => {
@@ -78,7 +60,6 @@
                     maxYIndex = $textArray.indexOf(obj);
                 }
             })
-
             nodeInZoneWidth = document.getElementById(`${maxXIndex}-node`).clientWidth;
             nodeInZoneHeight = document.getElementById(`${maxYIndex}-node`).clientHeight;
             zoneWidth =  (getMaxX - x) + (nodeInZoneWidth + 30);
@@ -89,15 +70,8 @@
         }
         console.log(nodeInZoneIndex);
     }
-
-    // $zoneArray = $zoneArray;
 </script>
 
-    <!-- left:${x}px;
-        top:${y}px; -->
-    <!-- 
-        
-    -->
 <div
     class="draggableContainer"
     style='width:{zoneWidth}px;height:{zoneHeight}px;'
@@ -119,58 +93,14 @@
     >
         {name}
     </strong>
-
-
-    <!-- {#if showOnHover}
-        <div style="display:flex; align-items:center; gap:5px;user-select:none;">
-            {#if connections.length == 0}
-                <button
-                    class={'scaleHover'}
-                    on:click={() => {
-                            $textArray.splice(index,1);
-                            $textArray = $textArray;
-                            $connectionArray = $connectionArray;
-                        }
-                    }
-                >
-                    <TrashCan/>
-                </button>
-            {/if}
-            <button
-                class={'scaleHover'}
-                on:click={() => {
-                        updateTextContainerContent();
-                        $textArray = $textArray;
-                    }
-                }
-                title="update content"
-            >
-                <ExamMode/>
-            </button>
-            <button 
-                class={'scaleHover'}
-                on:click={() => {
-                        updateTextContainerConnection();
-                        $textArray = $textArray;
-                    }
-                }
-                title="connect"
-            >
-                <IbmCloudSubnets/>
-            </button>
-        </div>
-    {/if} -->
 </div>
 <style>
-
 	.draggableContainer {
-        /* width: 200px; */
-        /* height: 200px; */
         position: absolute;
         border-radius: 0px 30px 30px 30px;
         padding: 10px;
         border: 2px solid rgba(244, 244, 244, 0.462);
-        background-color: rgba(244, 244, 244, 0.462);
+        background-color: rgba(244, 244, 244, 0.194);
         z-index: 5;
         transition:0.05s;
         box-shadow: 0px 0px 30px rgb(208, 208, 208);
@@ -178,6 +108,4 @@
     .draggableContainer:hover{
         cursor: all-scroll;
     }
-    /* .draggableContainer:active{
-    } */
 </style>

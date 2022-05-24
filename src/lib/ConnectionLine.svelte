@@ -19,14 +19,14 @@
 
 <div
     class="connectionLine"
-    style={`
-        height:${thickness}px;
-        left:${cx}px;
-        top:${cy}px;
-        width:${length}px;
-        transform:rotate(${angle}deg);
-        background-color:${color};
-    `}
+    style='
+        height:{thickness}px;
+        left:{cx}px;
+        top:{cy}px;
+        width:{length}px;
+        transform:rotate({angle}deg);
+        background-color:{color};
+    '
 >
     <button on:click={() => {
         let connectedNodes;
