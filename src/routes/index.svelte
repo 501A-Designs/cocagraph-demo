@@ -152,6 +152,7 @@
 
 	$: if ($metaData.name === 'untitled'){
 		modalType='navigation';
+		scaleValue = 10;
 		openModal=true;
 	}
 </script>
@@ -266,10 +267,10 @@
 				<ConnectionLine
 					firstElementIndex={connection.firstElementIndex}
 					secondElementIndex={connection.secondElementIndex}
+					index={$connectionArray.indexOf(connection)}
 					color={'var(--cocaOrange)'}
 					thickness={2}
 				/>
-				<!-- #a2a2a2 -->
 			{/each}
 		{/if}
 	</section>
@@ -332,6 +333,7 @@
 						class={'scaleHover'}
 						on:click|preventDefault={() => {
 							modalType='convertedJSON';
+							scaleValue = 10;
 							openModal=true;
 							animateScroll.scrollToTop();
 						}}
@@ -361,6 +363,7 @@
 				class="largeButton"
 				on:click|preventDefault={() => {
 					modalType='uploadLocalData';
+					scaleValue = 10;
 					openModal=true;
 					animateScroll.scrollToTop();
 				}}

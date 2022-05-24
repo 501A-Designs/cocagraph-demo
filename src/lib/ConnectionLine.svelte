@@ -1,8 +1,8 @@
 <script>
-    import { textArray, connectionArray,isDragging } from "../store";
+    import { textArray, connectionArray, isDragging } from "../store";
     import Cut from "carbon-icons-svelte/lib/Cut.svelte";
 
-    export let firstElementIndex,secondElementIndex, color, thickness;
+    export let firstElementIndex,secondElementIndex, color, thickness, index;
     // console.log(firstElementLocation);
     let firstElementData = $textArray[firstElementIndex];
     let secondElementData = $textArray[secondElementIndex];
@@ -30,27 +30,29 @@
 >
     <button on:click={() => {
         let connectedNodes;
+        $isDragging = true;
 
         $connectionArray.map((obj) => {
             if (obj.firstElementIndex == firstElementIndex && obj.secondElementIndex == secondElementIndex) {
                 connectedNodes = obj;
             }
         })
-        
-        let fCN = $textArray[connectedNodes.firstElementIndex];
-        let sCN = $textArray[connectedNodes.secondElementIndex];
 
-        let fCCN = fCN.connections.splice(connectedNodes.firstElementIndex,1)
-        let sCCN = sCN.connections.splice(connectedNodes.secondElementIndex,1)
+        let fCN = $textArray[connectedNodes.firstElementIndex].connections;
+        let sCN = $textArray[connectedNodes.secondElementIndex].connections;
+        console.log(fCN, sCN);
 
-        console.log(fCCN, sCCN);
+        $textArray[connectedNodes.firstElementIndex].connections = fCN.filter(e => e !== connectedNodes.secondElementIndex)
+        $textArray[connectedNodes.secondElementIndex].connections = sCN.filter(e => e !== connectedNodes.firstElementIndex)
+        $connectionArray.splice(index, 1);
 
-        // let finalVersionArray = removedFirst[connectedNodes.secondElementIndex].connections.filter((f) => { return f !== connectedNodes.firstElementIndex })
-
-        // $textArray = finalVersionArray;
         console.log($textArray);
+        $isDragging = false;
+        $textArray = $textArray;
         $connectionArray = $connectionArray;
-    }}><Cut /></button>
+    }}>
+        <Cut />
+    </button>
 </div>
 
 <style>
